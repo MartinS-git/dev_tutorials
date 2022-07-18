@@ -1,25 +1,55 @@
-import './App.css';
-// import { useState } from 'react/cjs/react.production.min';
+import "./App.css";
+import React, { useState, useEffect } from "react";
 
 function App() {
-// 	const [monsters, setMonsters] = useState([
-// 	{name: "Linda"},
-// 	{name: "Frank"},
-// 	{name: "Jacky"}
-// ])
+  const [monsters, setMonsters] = useState([]);
+  const [mapMonsters, setMapMonsters] = useState([]);
 
-const monsters = [
-	{name: "Linda"},
-	{name: "Frank"},
-	{name: "Jacky"}
-]
+  // Fetch API Data
+  useEffect(() => {
+    const url = "https://jsonplaceholder.typicode.com/users";
+    const fetchData = async () => {
+      try {
+        const response = await fetch(url);
+        const json = await response.json();
+        setMonsters(json);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    const filteredMonsters = monsters.filter((entries) => {
+      return entries.name.toLowerCase().includes(inputValue.toLowerCase());
+    });
+    setMapMonsters(filteredMonsters);
+  }, [inputValue]);
+
+  function RenderMonster() {
+    let monsterScr = inputValue ? mapMonsters : monsters;
+
+    return monsterScr.map((monster) => {
+      return <h1 key={monster.id}>{monster.name}</h1>;
+    });
+  }
 
   return (
-<div>
-      {monsters.map((monster) => {
-		return <h1>{monster.name}</h1>
-	  })}
-	  </div>
+    <div>
+      <input
+        className='search-box'
+        type='search'
+        placeholder='Search monsters'
+        onChange={(event) => {
+          setInputValue(event.target.value);
+        }}
+        value={inputValue}
+      />
+      <RenderMonster />
+    </div>
   );
 }
 
