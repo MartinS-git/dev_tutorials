@@ -1,9 +1,12 @@
-import "./App.css";
 import React, { useState, useEffect } from "react";
+import "./App.css";
+import CardList from "./components/card-list/card-list.component";
+import SearchBox from "./components/search-box/search-box.component";
 
-function App() {
+const App = () => {
+  const [searchInput, setSearchInput] = useState("");
   const [monsters, setMonsters] = useState([]);
-  const [mapMonsters, setMapMonsters] = useState([]);
+  const [mapMonsters, setMapMonsters] = useState(monsters);
 
   // Fetch API Data
   useEffect(() => {
@@ -18,39 +21,26 @@ function App() {
       }
     };
     fetchData();
-  }, []);
+  }, []); // empty array means to run this function only one time
 
-  const [inputValue, setInputValue] = useState("");
+  function onChangeHandler(event) {
+    setSearchInput(event.target.value.toLowerCase());
+  }
 
   useEffect(() => {
     const filteredMonsters = monsters.filter((entries) => {
-      return entries.name.toLowerCase().includes(inputValue.toLowerCase());
+      return entries.name.toLowerCase().includes(searchInput);
     });
     setMapMonsters(filteredMonsters);
-  }, [inputValue]);
-
-  function RenderMonster() {
-    let monsterScr = inputValue ? mapMonsters : monsters;
-
-    return monsterScr.map((monster) => {
-      return <h1 key={monster.id}>{monster.name}</h1>;
-    });
-  }
+  }, [monsters, searchInput]);
 
   return (
     <div>
-      <input
-        className='search-box'
-        type='search'
-        placeholder='Search monsters'
-        onChange={(event) => {
-          setInputValue(event.target.value);
-        }}
-        value={inputValue}
-      />
-      <RenderMonster />
+      <h1>Monster Rolodex</h1>
+      <SearchBox placeholder='Search monsters' onChange={onChangeHandler} />
+      <CardList monsters={mapMonsters} />
     </div>
   );
-}
+};
 
 export default App;
